@@ -10,6 +10,19 @@ import java.util.List;
 public class Tweet {
     public String body;
     public String createdAt;
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
     public User user;
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
