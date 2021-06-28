@@ -1,7 +1,6 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
@@ -65,19 +63,25 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public static final String TAG = "TweetsAdapter";
         ImageView ivProfileImage;
         TextView tvBody;
+        TextView tvName;
         TextView tvScreenName;
+        TextView tvTimeStamp;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
+            tvName = itemView.findViewById(R.id.tvName);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            tvTimeStamp = itemView.findViewById(R.id.tvTimeStamp);
 
         }
 
         public void bind(Tweet tweet) {
             tvBody.setText(tweet.getBody());
-            tvScreenName.setText(tweet.getUser().getScreenName());
+            tvName.setText(tweet.getUser().getName());
+            tvScreenName.setText("@" + tweet.getUser().getScreenName());
+            tvTimeStamp.setText("· " + tweet.getRelativeTimeAgo());
             Glide.with(context).load(tweet.getUser().getProfileImageUrl())
                     .transform(new RoundedCornersTransformation(30,0))
                     .into(ivProfileImage);
