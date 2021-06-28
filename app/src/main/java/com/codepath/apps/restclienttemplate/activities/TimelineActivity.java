@@ -3,11 +3,16 @@ package com.codepath.apps.restclienttemplate.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
@@ -40,8 +45,15 @@ public class TimelineActivity extends AppCompatActivity {
 
         ActivityTimelineBinding binding = ActivityTimelineBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
+        binding.btLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onLogoutButton();
+            }
+        });
 
         setContentView(view);
+        setSupportActionBar(binding.tbTimeline);
 
 //        rvTweets = binding.rvTweets;
 //        rvTweets = findViewById(R.id.rvTweets);
@@ -73,5 +85,26 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.e(TAG,"onFailure " + response, throwable);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_timeline,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.compose) {
+            Toast.makeText(this,"Compose",Toast.LENGTH_SHORT).show();
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // TimelineActivity.java
+    public void onLogoutButton() {
+        client.clearAccessToken(); // forget who's logged in
+        finish(); // navigate backwards to Login screen
     }
 }
