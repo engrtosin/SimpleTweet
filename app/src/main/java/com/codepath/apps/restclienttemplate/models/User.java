@@ -4,12 +4,17 @@ import android.util.JsonReader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
+@Parcel
 public class User {
 
     public String name;
     public String screenName;
     public String profileImageUrl;
+
+    // empty constructor needed for parcel
+    public User(){}
 
     public String getName() {
         return name;

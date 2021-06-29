@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +25,7 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +34,13 @@ import okhttp3.Headers;
 
 public class TimelineActivity extends AppCompatActivity {
 
+    public final int REQUEST_CODE = 20;
     public static final String TAG = "TimelineActivity";
     TwitterClient client;
     List<Tweet> tweets;
 //    RecyclerView rvTweets;
     TweetsAdapter tweetsAdapter;
+    ActivityTimelineBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +48,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         client = TwitterApp.getRestClient(this);
 
-        ActivityTimelineBinding binding = ActivityTimelineBinding.inflate(getLayoutInflater());
+        binding = ActivityTimelineBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         binding.btLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,9 +102,21 @@ public class TimelineActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.compose) {
             Intent intent = new Intent(this, ComposeActivity.class);
-            this.startActivity(intent);
+            startActivityForResult(intent,REQUEST_CODE);
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
+            tweets.add(0,tweet);
+            tweetsAdapter.notifyItemInserted(0);
+            binding.rvTweets.smoothScrollToPosition(0);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     // TimelineActivity.java
