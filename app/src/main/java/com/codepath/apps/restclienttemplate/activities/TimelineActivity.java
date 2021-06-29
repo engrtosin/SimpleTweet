@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import okhttp3.Headers;
 
 public class TimelineActivity extends AppCompatActivity {
@@ -41,6 +43,7 @@ public class TimelineActivity extends AppCompatActivity {
 //    RecyclerView rvTweets;
     TweetsAdapter tweetsAdapter;
     ActivityTimelineBinding binding;
+    MediaListAdapter mediaListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,10 @@ public class TimelineActivity extends AppCompatActivity {
 
         binding = ActivityTimelineBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        binding.btLogout.setOnClickListener(new View.OnClickListener() {
+        Glide.with(this).load(R.drawable.twitter_logout)
+                .transform(new RoundedCornersTransformation(40,0))
+                .into(binding.btnLogout);
+        binding.btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onLogoutButton();
@@ -68,7 +74,15 @@ public class TimelineActivity extends AppCompatActivity {
 
         binding.rvTweets.setLayoutManager(new LinearLayoutManager(this));
         binding.rvTweets.setAdapter(tweetsAdapter);
+
         populateHomeTimeline();
+
+        binding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTimelineAsync(0);
+            }
+        });
     }
 
     private void populateHomeTimeline() {
@@ -88,6 +102,32 @@ public class TimelineActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.e(TAG,"onFailure " + response, throwable);
+            }
+        });
+    }
+
+    public void fetchTimelineAsync(int page) {
+        // Send the network request to fetch the updated data
+        // `client` here is an instance of Android Async HTTP
+        // getHomeTimeline is an example endpoint.
+        client.getHomeTimeline(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                // Remember to CLEAR OUT old items before appending in the new ones
+                tweetsAdapter.clear();
+                // ...the data has come back, add new items to your adapter...
+                try {
+                    tweetsAdapter.addAll(Tweet.fromJsonArray(json.jsonArray));
+                    // Now we call setRefreshing(false) to signal refresh has finished
+                    binding.swipeContainer.setRefreshing(false);
+                } catch (JSONException e) {
+                    Log.e(TAG,"Failed to retrieve tweets objects: ", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG, "Fetch timeline error: ",throwable);
             }
         });
     }

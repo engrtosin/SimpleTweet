@@ -56,4 +56,16 @@
         android:layout_marginTop="0dp"
         android:layout_toEndOf="@+id/tvScreenName"
         android:text="· 1hr" />
+
+    <ImageView
+        android:id="@+id/ivEmbedPhoto"
+        android:layout_width="250dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/tvBody"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/ivProfileImage"
+        android:scaleType="fitXY"
+        tools:srcCompat="@tools:sample/avatars" />
+
 </RelativeLayout>

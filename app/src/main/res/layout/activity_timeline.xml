@@ -20,27 +20,33 @@
             android:layout_height="match_parent"
             android:gravity="end" >
 
-            <ImageButton
-                android:id="@+id/btLogout"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
+            <ImageView
+                android:id="@+id/btnLogout"
+                android:layout_width="60dp"
+                android:layout_height="22dp"
                 android:scaleType="fitXY"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/twitter_logout" />
         </LinearLayout>
 
-
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTweets"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/tbTimeline"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp" />
+        android:layout_below="@id/tbTimeline">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTweets"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
