@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -96,8 +97,8 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.compose) {
-            Toast.makeText(this,"Compose",Toast.LENGTH_SHORT).show();
-
+            Intent intent = new Intent(this, ComposeActivity.class);
+            this.startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
