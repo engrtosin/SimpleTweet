@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -72,15 +73,22 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     // bind values based on the position of the element
 
     // define a viewholder
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public static final String TAG = "TweetsAdapter";
+        Tweet tweet;
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvName;
         TextView tvScreenName;
         TextView tvTimeStamp;
         ImageView ivEmbedPhoto;
+        ImageView ivReply;
+        ImageView ivRetweet;
+        ImageView ivHeart;
+        TextView tvReplyCount;
+        TextView tvRetweetCount;
+        TextView tvHeartCount;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -91,13 +99,64 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvTimeStamp = itemView.findViewById(R.id.tvTimeStamp);
             ivEmbedPhoto = itemView.findViewById(R.id.ivEmbedPhoto);
             ivEmbedPhoto.setVisibility(View.VISIBLE);
+            ivReply = itemView.findViewById(R.id.ivReply);
+            ivRetweet = itemView.findViewById(R.id.ivRetweet);
+            ivHeart = itemView.findViewById(R.id.ivHeart);
+            tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
+            tvRetweetCount = itemView.findViewById(R.id.tvRetweetCount);
+            tvHeartCount = itemView.findViewById(R.id.tvHeartCount);
+
+
+
+            ivReply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onClickReply();
+                }
+            });
+
+            ivRetweet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onClickRetweet();
+                }
+            });
+
+            ivHeart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onClickHeart();
+                }
+            });
+        }
+
+        private void onClickHeart() {
+            tweet.userHearted = !tweet.userHearted;
+            updateRetweetedOrHeartedIcons();
+        }
+
+        private void onClickRetweet() {
+            tweet.userRetweeted = !tweet.userRetweeted;
+            updateRetweetedOrHeartedIcons();
+        }
+
+        private void onClickReply() {
+            Log.i(TAG,"Reply selected.");
         }
 
         public void bind(Tweet tweet) {
-            tvBody.setText(tweet.getBody());
+            this.tweet = tweet;
+            String bodyText = tweet.getBody();
+            if (tweet.getBodyUrl().length() > 1) {
+                bodyText += "\n" + tweet.getBodyUrl();
+            }
+            tvBody.setText(bodyText);
             tvName.setText(tweet.getUser().getName());
             tvScreenName.setText("@" + tweet.getUser().getScreenName());
             tvTimeStamp.setText("· " + tweet.getRelativeTimeAgo());
+            tvReplyCount.setText(String.valueOf(tweet.getReplyCount()));
+            tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
+            tvHeartCount.setText(String.valueOf(tweet.getHeartCount()));
             Glide.with(context).load(tweet.getUser().getProfileImageUrl())
                     .transform(new RoundedCornersTransformation(30,0))
                     .into(ivProfileImage);
@@ -110,6 +169,31 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             else {
                 ivEmbedPhoto.setVisibility(View.GONE);
             }
+            updateRetweetedOrHeartedIcons();
+        }
+
+        private void updateRetweetedOrHeartedIcons() {
+            if (tweet.isUserRetweeted() == true) {
+                Glide.with(context).load(R.drawable.ic_vector_retweet).into(ivRetweet);
+                ivRetweet.setColorFilter(ContextCompat.getColor(context, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
+            }
+            else {
+                Glide.with(context).load(R.drawable.ic_vector_retweet_stroke).into(ivRetweet);
+                ivRetweet.setColorFilter(ContextCompat.getColor(context, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
+            }
+            if (tweet.isUserHearted() == true) {
+                Glide.with(context).load(R.drawable.ic_vector_heart).into(ivHeart);
+                ivHeart.setColorFilter(ContextCompat.getColor(context, R.color.medium_red), android.graphics.PorterDuff.Mode.SRC_IN);
+            }
+            else {
+                Glide.with(context).load(R.drawable.ic_vector_heart_stroke).into(ivHeart);
+                ivHeart.setColorFilter(ContextCompat.getColor(context, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            Log.i(TAG,"Tweet at clicked");
         }
     }
 }

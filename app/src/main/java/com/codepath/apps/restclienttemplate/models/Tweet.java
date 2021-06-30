@@ -19,11 +19,25 @@ public class Tweet {
 
     public static final String TAG = "TweetModel";
     public String body;
+    public String bodyUrl;
     public String createdAt;
     public User user;
     public List<String> photoUrls;
     public List<String> hashtags;
     public List<String> urls;
+    public int replyCount;
+    public int retweetCount;
+    public Integer heartCount;
+    public boolean userRetweeted;
+    public boolean userHearted;
+
+    public boolean isUserRetweeted() {
+        return userRetweeted;
+    }
+
+    public boolean isUserHearted() {
+        return userHearted;
+    }
 
     // empty constructor needed by parcel
     public Tweet() {}
@@ -41,9 +55,39 @@ public class Tweet {
     }
 
 
+    public String getBodyUrl() {
+        return bodyUrl;
+    }
+
+    public int getReplyCount() {
+        return replyCount;
+    }
+
+    public int getRetweetCount() {
+        return retweetCount;
+    }
+
+    public Integer getHeartCount() {
+        return heartCount;
+    }
+
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
+        tweet.replyCount = jsonObject.has("reply_count") ? jsonObject.getInt("reply_count") : 0;
+        tweet.retweetCount = jsonObject.has("retweet_count") ? jsonObject.getInt("retweet_count") : 0;
+        tweet.userRetweeted = jsonObject.getBoolean("retweeted");
+        tweet.userHearted = jsonObject.getBoolean("favorited");
+        tweet.heartCount = jsonObject.has("heart_count") ? jsonObject.getInt("heart_count") : 0;
         tweet.body = jsonObject.getString("text");
+        String[] bodies = tweet.body.split(" http");
+        tweet.body = bodies[0];
+        if (bodies.length > 1) {
+            tweet.bodyUrl = "http" + bodies[1];
+        }
+        else {
+            tweet.bodyUrl = "";
+        }
+        Log.i(TAG,"body: " + tweet.body + " " + tweet.bodyUrl);
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
         JSONObject entities = jsonObject.getJSONObject("entities");

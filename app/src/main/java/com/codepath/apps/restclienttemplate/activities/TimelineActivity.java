@@ -2,12 +2,17 @@ package com.codepath.apps.restclienttemplate.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -63,8 +68,18 @@ public class TimelineActivity extends AppCompatActivity {
             }
         });
 
+
         setContentView(view);
         setSupportActionBar(binding.tbTimeline);
+
+        Drawable dr = getResources().getDrawable(R.drawable.ic_launcher_twitter_png);
+        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+// Scale it to 50 x 50
+        dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 50, 50, true));
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(dr);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        setMenuIcons();
 
 //        rvTweets = binding.rvTweets;
 //        rvTweets = findViewById(R.id.rvTweets);
@@ -83,6 +98,10 @@ public class TimelineActivity extends AppCompatActivity {
                 fetchTimelineAsync(0);
             }
         });
+    }
+
+    private void setMenuIcons() {
+        MenuItem compose = (MenuItem) findViewById(R.id.compose);
     }
 
     private void populateHomeTimeline() {
@@ -135,6 +154,7 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_timeline,menu);
+        Drawable drawable = menu.findItem(R.id.compose).getIcon();
         return true;
     }
 
