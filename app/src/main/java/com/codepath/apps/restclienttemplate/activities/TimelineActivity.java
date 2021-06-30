@@ -49,6 +49,7 @@ public class TimelineActivity extends AppCompatActivity {
     TweetsAdapter tweetsAdapter;
     ActivityTimelineBinding binding;
     MediaListAdapter mediaListAdapter;
+    MenuItem miActionProgressItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,13 +102,28 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
     private void setMenuIcons() {
+        Log.i(TAG,"setMenuIcons");
         MenuItem compose = (MenuItem) findViewById(R.id.compose);
+        miActionProgressItem = (MenuItem) findViewById(R.id.miActionProgress);
+//        Log.i(TAG, miActionProgressItem.toString());
+    }
+
+    public void showProgressBar() {
+        // Show progress item
+        miActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        miActionProgressItem.setVisible(false);
     }
 
     private void populateHomeTimeline() {
+//        showProgressBar();
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
+//                hideProgressBar();
                 Log.i(TAG,"onSuccess " + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
@@ -120,6 +136,7 @@ public class TimelineActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+//                hideProgressBar();
                 Log.e(TAG,"onFailure " + response, throwable);
             }
         });
@@ -129,9 +146,11 @@ public class TimelineActivity extends AppCompatActivity {
         // Send the network request to fetch the updated data
         // `client` here is an instance of Android Async HTTP
         // getHomeTimeline is an example endpoint.
+//        showProgressBar();
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
+//                hideProgressBar();
                 // Remember to CLEAR OUT old items before appending in the new ones
                 tweetsAdapter.clear();
                 // ...the data has come back, add new items to your adapter...
@@ -146,6 +165,7 @@ public class TimelineActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+//                hideProgressBar();
                 Log.e(TAG, "Fetch timeline error: ",throwable);
             }
         });
@@ -156,6 +176,16 @@ public class TimelineActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_timeline,menu);
         Drawable drawable = menu.findItem(R.id.compose).getIcon();
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Store instance of the menu item containing progress
+        Log.i(TAG,"onPrepareOptions");
+        miActionProgressItem = menu.findItem(R.id.miActionProgress);
+
+        // Return to finish
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

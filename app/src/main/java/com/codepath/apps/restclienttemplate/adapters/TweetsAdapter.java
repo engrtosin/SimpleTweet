@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.activities.MediaListAdapter;
+import com.codepath.apps.restclienttemplate.activities.TweetDetailActivity;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
@@ -105,6 +109,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvReplyCount = itemView.findViewById(R.id.tvReplyCount);
             tvRetweetCount = itemView.findViewById(R.id.tvRetweetCount);
             tvHeartCount = itemView.findViewById(R.id.tvHeartCount);
+
+            itemView.setOnClickListener(this);
 
 
 
@@ -193,7 +199,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         @Override
         public void onClick(View view) {
+
             Log.i(TAG,"Tweet at clicked");
+            Intent intent = new Intent(context, TweetDetailActivity.class);
+            List<Tweet> tweet_and_reply = new ArrayList<>();
+            tweet_and_reply.add(tweet);
+            intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet_and_reply));
+            context.startActivity(intent);
         }
     }
 }
