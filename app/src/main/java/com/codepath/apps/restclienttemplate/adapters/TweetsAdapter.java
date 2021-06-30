@@ -155,7 +155,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         private void onClickReply() {
             FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
-            ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance("Compose Tweet");
+            ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance("Reply Tweet");
             composeTweetDialogFragment.show(fm, "fragment_edit_name");
             Log.i(TAG,"Reply selected.");
         }

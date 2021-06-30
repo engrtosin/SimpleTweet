@@ -87,15 +87,27 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
         // Fetch arguments from bundle and set title
         String title = getArguments().getString("title", "Enter Name");
         getDialog().setTitle(title);
-        // Show soft keyboard automatically and request focus to field
-        binding.etCompose1.requestFocus();
-        // set on click listener for send button
-        binding.ivBtnTweet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                publishNewTweet();
-            }
-        });
+        if (title.equals("Compose Tweet")) {
+            // Show soft keyboard automatically and request focus to field
+            binding.etCompose1.requestFocus();
+            // set on click listener for send button
+            binding.ivBtnTweet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    publishNewTweet();
+                }
+            });
+        }
+        else if (title.equals("Reply Tweet")) {
+            binding.etCompose1.requestFocus();
+            // set on click listener for send button
+            binding.ivBtnTweet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    binding.etCompose1.setText("No replies yet.");
+                }
+            });
+        }
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
