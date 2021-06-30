@@ -4,6 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +29,7 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class TweetDetailActivity extends AppCompatActivity {
 
+    public static final int LOGOUT_RESULT_CODE = 40;
     public static final String TAG = "TweetDetailActivity";
     ActivityTweetDetailBinding binding;
 
@@ -37,7 +42,27 @@ public class TweetDetailActivity extends AppCompatActivity {
 
         binding = ActivityTweetDetailBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
+        Glide.with(this).load(R.drawable.twitter_logout)
+                .transform(new RoundedCornersTransformation(40,0))
+                .into(binding.btnLogout1);
+        binding.btnLogout1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         setContentView(view);
+
+        setSupportActionBar(binding.tbDetails);
+
+        Drawable dr = getResources().getDrawable(R.drawable.ic_launcher_twitter_png);
+        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+// Scale it to 50 x 50
+        dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 50, 50, true));
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(dr);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
         binding.viewTweetReply.setVisibility(View.GONE);
 
         List<Tweet> tweet_and_reply = (List<Tweet>) Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
@@ -47,6 +72,13 @@ public class TweetDetailActivity extends AppCompatActivity {
         }
         setUpDetailsView();
     }
+
+//    private void onLogoutButton() {
+//        Intent intent = new Intent(this,TimelineActivity.class);
+//        Log.i(TAG,"Logout");
+//        intent.putExtra("Logout","true");
+//        this.startActivity(intent);
+//    }
 
     private void setUpDetailsView() {
         String bodyText = tweet.getBody();

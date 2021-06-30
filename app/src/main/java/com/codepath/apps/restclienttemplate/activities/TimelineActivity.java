@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -26,6 +27,7 @@ import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding;
+import com.codepath.apps.restclienttemplate.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
@@ -39,9 +41,11 @@ import java.util.List;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import okhttp3.Headers;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements ComposeTweetDialogFragment.ComposeTweetDialogListener {
 
+    public static final int LOGOUT_RESULT_CODE = 40;
     public final int REQUEST_CODE = 20;
+    public final int REQUEST_DETAILS_CODE = 30;
     public static final String TAG = "TimelineActivity";
     TwitterClient client;
     List<Tweet> tweets;
@@ -101,10 +105,16 @@ public class TimelineActivity extends AppCompatActivity {
         });
     }
 
+    private void showEditDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance("Compose Tweet");
+        composeTweetDialogFragment.show(fm, "fragment_edit_name");
+    }
+
     private void setMenuIcons() {
         Log.i(TAG,"setMenuIcons");
         MenuItem compose = (MenuItem) findViewById(R.id.compose);
-        miActionProgressItem = (MenuItem) findViewById(R.id.miActionProgress);
+//        miActionProgressItem = (MenuItem) findViewById(R.id.miActionProgress);
 //        Log.i(TAG, miActionProgressItem.toString());
     }
 
@@ -119,11 +129,10 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
     private void populateHomeTimeline() {
-//        showProgressBar();
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
-//                hideProgressBar();
+                showProgressBar();
                 Log.i(TAG,"onSuccess " + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
@@ -132,6 +141,7 @@ public class TimelineActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     Log.e(TAG,"Cannot get tweets from jsonarray", e);
                 }
+                hideProgressBar();
             }
 
             @Override
@@ -146,7 +156,7 @@ public class TimelineActivity extends AppCompatActivity {
         // Send the network request to fetch the updated data
         // `client` here is an instance of Android Async HTTP
         // getHomeTimeline is an example endpoint.
-//        showProgressBar();
+        showProgressBar();
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
@@ -161,6 +171,7 @@ public class TimelineActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     Log.e(TAG,"Failed to retrieve tweets objects: ", e);
                 }
+                hideProgressBar();
             }
 
             @Override
@@ -191,8 +202,9 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.compose) {
-            Intent intent = new Intent(this, ComposeActivity.class);
-            startActivityForResult(intent,REQUEST_CODE);
+            showEditDialog();
+//            Intent intent = new Intent(this, ComposeActivity.class);
+//            startActivityForResult(intent,REQUEST_CODE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -206,12 +218,24 @@ public class TimelineActivity extends AppCompatActivity {
             tweetsAdapter.notifyItemInserted(0);
             binding.rvTweets.smoothScrollToPosition(0);
         }
+        if (requestCode == REQUEST_DETAILS_CODE && resultCode == LOGOUT_RESULT_CODE) {
+            onLogoutButton();
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     // TimelineActivity.java
     public void onLogoutButton() {
         client.clearAccessToken(); // forget who's logged in
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
         finish(); // navigate backwards to Login screen
+    }
+
+    @Override
+    public void onFinishEditDialog(Tweet tweet) {
+        tweets.add(0,tweet);
+        tweetsAdapter.notifyItemInserted(0);
+        binding.rvTweets.smoothScrollToPosition(0);
     }
 }
