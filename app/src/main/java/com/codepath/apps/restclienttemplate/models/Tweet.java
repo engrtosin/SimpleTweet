@@ -77,7 +77,7 @@ public class Tweet {
         tweet.retweetCount = jsonObject.has("retweet_count") ? jsonObject.getInt("retweet_count") : 0;
         tweet.userRetweeted = jsonObject.getBoolean("retweeted");
         tweet.userHearted = jsonObject.getBoolean("favorited");
-        tweet.heartCount = jsonObject.has("heart_count") ? jsonObject.getInt("heart_count") : 0;
+        tweet.heartCount = jsonObject.has("favorite_count") ? jsonObject.getInt("favorite_count") : 0;
         tweet.body = jsonObject.getString("text");
         String[] bodies = tweet.body.split(" http");
         tweet.body = bodies[0];
