@@ -85,7 +85,9 @@ public class Tweet {
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
+        Log.i(TAG,String.valueOf(jsonObject.has("reply_count")));
         tweet.replyCount = jsonObject.has("reply_count") ? jsonObject.getInt("reply_count") : 0;
+        Log.i(TAG,"reply count: " + String.valueOf(tweet.replyCount));
         tweet.retweetCount = jsonObject.has("retweet_count") ? jsonObject.getInt("retweet_count") : 0;
         tweet.userRetweeted = jsonObject.getBoolean("retweeted");
         tweet.userHearted = jsonObject.getBoolean("favorited");
