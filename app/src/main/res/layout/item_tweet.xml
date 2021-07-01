@@ -38,6 +38,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
         android:layout_toEndOf="@+id/ivProfileImage"
+        android:autoLink="all"
         android:text="My sample tweet body!"
         android:textColor="@color/black" />
 

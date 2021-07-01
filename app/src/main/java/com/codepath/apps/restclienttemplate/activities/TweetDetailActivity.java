@@ -109,8 +109,8 @@ public class TweetDetailActivity extends AppCompatActivity {
         else {
             binding.ivEmbedPhoto.setVisibility(View.GONE);
         }
-        updateRetweetedIcons(false);
-        updateHeartedIcons(false);
+        updateRetweetedTweetIcons(false);
+        updateHeartedTweetIcons(false);
         binding.ivReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,14 +121,16 @@ public class TweetDetailActivity extends AppCompatActivity {
         binding.ivRetweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateRetweetedIcons(false);
+                Log.i(TAG,"wants to retweet tweet");
+                updateRetweetedTweetIcons(true);
             }
         });
 
         binding.ivHeart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateHeartedIcons(false);
+                Log.i(TAG,"wants to heart tweet");
+                updateHeartedTweetIcons(true);
             }
         });
     }
@@ -157,8 +159,8 @@ public class TweetDetailActivity extends AppCompatActivity {
         else {
             binding.ivEmbedPhoto1.setVisibility(View.GONE);
         }
-        updateHeartedIcons(false);
-        updateRetweetedIcons(false);
+        updateHeartedReplyIcons(false);
+        updateRetweetedReplyIcons(false);
         binding.ivReply1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,32 +171,51 @@ public class TweetDetailActivity extends AppCompatActivity {
         binding.ivRetweet1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateRetweetedIcons(true);
+                Log.i(TAG,"wants to heart reply");
+                updateRetweetedReplyIcons(true);
             }
         });
 
         binding.ivHeart1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateHeartedIcons(true);
+                Log.i(TAG,"wants to heart reply");
+                updateHeartedReplyIcons(true);
             }
         });
     }
 
-    private void updateRetweetedIcons(boolean changeIcon) {
+    private void updateRetweetedTweetIcons(boolean changeIcon) {
         if (changeIcon) {
             if (tweet.isUserRetweeted() == false) {
+                Log.i(TAG,"want to retweet");
                 Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet);
                 binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
                 binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
                 tweet.retweetThis(this);
             } else {
+                Log.i(TAG,"does not want ot retweet");
                 Glide.with(this).load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet);
                 binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
                 binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() - 1));
                 tweet.unretweetThis(this);
             }
+        }
+        else {
+            if (tweet.isUserRetweeted() == true) {
+                Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet);
+                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
+            } else {
+                Glide.with(this).load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet);
+                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
+            }
+        }
+    }
 
+    private void updateRetweetedReplyIcons(boolean changeIcon) {
+        if (changeIcon) {
             if (reply != null) {
                 if (reply.isUserRetweeted() == false) {
                     Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet1);
@@ -211,36 +232,22 @@ public class TweetDetailActivity extends AppCompatActivity {
             }
         }
         else {
-            if (tweet.isUserRetweeted() == true) {
-                Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet);
-                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
-                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
-                //            tweet.retweetThis(this);
-            } else {
-                Glide.with(this).load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet);
-                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
-                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
-                //            tweet.retweetThis(this);
-            }
-
             if (reply != null) {
                 if (reply.isUserRetweeted() == true) {
                     Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet1);
                     binding.ivRetweet1.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
-                    binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
-                    //                tweet.retweetThis(this);
+                    binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
                 } else {
                     Glide.with(this).
                             load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet1);
                     binding.ivRetweet1.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
-                    binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() - 1));
-                    //                tweet.retweetThis(this);
+                    binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
                 }
             }
         }
     }
 
-    private void updateHeartedIcons(boolean changeIcon) {
+    private void updateHeartedTweetIcons(boolean changeIcon) {
         if (changeIcon) {
             if (tweet.isUserHearted() == false) {
                 Glide.with(this).load(R.drawable.ic_vector_heart).into(binding.ivHeart);
@@ -253,7 +260,22 @@ public class TweetDetailActivity extends AppCompatActivity {
                 binding.tvHeartCount.setText(String.valueOf(tweet.getHeartCount() - 1));
                 tweet.unheartThis(this);
             }
+        }
+        else {
+            if (tweet.isUserRetweeted() == true) {
+                Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet);
+                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
+            } else {
+                Glide.with(this).load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet);
+                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
+                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount()));
+            }
+        }
+    }
 
+    private void updateHeartedReplyIcons(boolean changeIcon) {
+        if (changeIcon) {
             if (reply != null) {
                 if (reply.isUserHearted() == false) {
                     Glide.with(this).load(R.drawable.ic_vector_heart).into(binding.ivHeart1);
@@ -270,30 +292,16 @@ public class TweetDetailActivity extends AppCompatActivity {
             }
         }
         else {
-            if (tweet.isUserRetweeted() == true) {
-                Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet);
-                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
-                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
-                //            tweet.retweetThis(this);
-            } else {
-                Glide.with(this).load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet);
-                binding.ivRetweet.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
-                binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
-                //            tweet.retweetThis(this);
-            }
-
             if (reply != null) {
                 if (reply.isUserRetweeted() == true) {
                     Glide.with(this).load(R.drawable.ic_vector_retweet).into(binding.ivRetweet1);
                     binding.ivRetweet1.setColorFilter(ContextCompat.getColor(this, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
-                    binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() + 1));
-                    //                tweet.retweetThis(this);
+                    binding.tvRetweetCount1.setText(String.valueOf(reply.getRetweetCount()));
                 } else {
                     Glide.with(this).
                             load(R.drawable.ic_vector_retweet_stroke).into(binding.ivRetweet1);
                     binding.ivRetweet1.setColorFilter(ContextCompat.getColor(this, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
-                    binding.tvRetweetCount.setText(String.valueOf(tweet.getRetweetCount() - 1));
-                    //                tweet.retweetThis(this);
+                    binding.tvRetweetCount1.setText(String.valueOf(reply.getRetweetCount()));
                 }
             }
         }

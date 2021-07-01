@@ -71,6 +71,7 @@
             android:layout_below="@+id/tvName"
             android:layout_marginStart="5dp"
             android:layout_marginTop="2dp"
+            android:autoLink="all"
             android:layout_toEndOf="@+id/ivProfileImage"
             android:text="My sample tweet body!"
             android:textColor="@color/black" />
@@ -229,6 +230,7 @@
             android:id="@+id/tvBody1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:autoLink="all"
             android:layout_below="@+id/tvName1"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1.6dp"
