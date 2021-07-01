@@ -144,18 +144,16 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         }
 
         private void onClickHeart() {
-            tweet.userHearted = !tweet.userHearted;
-            updateRetweetedOrHeartedIcons();
+            updateHeartedIcons();
         }
 
         private void onClickRetweet() {
-            tweet.userRetweeted = !tweet.userRetweeted;
-            updateRetweetedOrHeartedIcons();
+            updateRetweetedIcons();
         }
 
         private void onClickReply() {
             FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
-            ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance("Reply Tweet");
+            ComposeTweetDialogFragment composeTweetDialogFragment = ComposeTweetDialogFragment.newInstance("Reply Tweet", tweet);
             composeTweetDialogFragment.show(fm, "fragment_edit_name");
             Log.i(TAG,"Reply selected.");
         }
@@ -185,10 +183,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             else {
                 ivEmbedPhoto.setVisibility(View.GONE);
             }
-            updateRetweetedOrHeartedIcons();
-        }
-
-        private void updateRetweetedOrHeartedIcons() {
             if (tweet.isUserRetweeted() == true) {
                 Glide.with(context).load(R.drawable.ic_vector_retweet).into(ivRetweet);
                 ivRetweet.setColorFilter(ContextCompat.getColor(context, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
@@ -207,6 +201,36 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             }
         }
 
+        private void updateRetweetedIcons() {
+            if (tweet.isUserRetweeted() == false) {
+                Glide.with(context).load(R.drawable.ic_vector_retweet).into(ivRetweet);
+                ivRetweet.setColorFilter(ContextCompat.getColor(context, R.color.medium_green), android.graphics.PorterDuff.Mode.SRC_IN);
+                tvRetweetCount.setText(String.valueOf(tweet.retweetCount + 1));
+                tweet.retweetThis(context);
+            }
+            else {
+                Glide.with(context).load(R.drawable.ic_vector_retweet_stroke).into(ivRetweet);
+                ivRetweet.setColorFilter(ContextCompat.getColor(context, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
+                tvRetweetCount.setText(String.valueOf(tweet.retweetCount - 1));
+                tweet.unretweetThis(context);
+            }
+        }
+
+        private void updateHeartedIcons() {
+            if (tweet.isUserHearted() == false) {
+                Glide.with(context).load(R.drawable.ic_vector_heart).into(ivHeart);
+                ivHeart.setColorFilter(ContextCompat.getColor(context, R.color.medium_red), android.graphics.PorterDuff.Mode.SRC_IN);
+                tvHeartCount.setText(String.valueOf(tweet.heartCount + 1));
+                tweet.heartThis(context);
+            }
+            else {
+                Glide.with(context).load(R.drawable.ic_vector_heart_stroke).into(ivHeart);
+                ivHeart.setColorFilter(ContextCompat.getColor(context, R.color.inline_action), android.graphics.PorterDuff.Mode.SRC_IN);
+                tvHeartCount.setText(String.valueOf(tweet.heartCount - 1));
+                tweet.unheartThis(context);
+            }
+        }
+
         @Override
         public void onClick(View view) {
 
@@ -214,7 +238,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Intent intent = new Intent(context, TweetDetailActivity.class);
             List<Tweet> tweet_and_reply = new ArrayList<>();
             tweet_and_reply.add(tweet);
-            intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet_and_reply));
+            intent.putExtra("tweet and reply", Parcels.wrap(tweet_and_reply));
             context.startActivity(intent);
         }
     }

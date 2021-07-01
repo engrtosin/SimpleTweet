@@ -30,6 +30,9 @@ import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import org.json.JSONException;
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import okhttp3.Headers;
 // ...
 
@@ -40,6 +43,8 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
     private ImageView mBtnTweet;
     FragmentEditNameBinding binding;
     TwitterClient client;
+    Tweet tweetToReply;
+    String replyToId;
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -51,13 +56,22 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
     }
 
     public interface ComposeTweetDialogListener {
-        void onFinishEditDialog(Tweet tweet);
+        void onFinishEditDialog(List<Tweet> tweet_and_reply);
     }
 
     public ComposeTweetDialogFragment() {
         // Empty constructor is required for DialogFragment
         // Make sure not to add arguments to the constructor
         // Use `newInstance` instead as shown below
+    }
+
+    public static ComposeTweetDialogFragment  newInstance(String title, Tweet replyTweet) {
+        ComposeTweetDialogFragment frag = new ComposeTweetDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("title", title);
+        args.putParcelable("replyTo",Parcels.wrap(replyTweet));
+        frag.setArguments(args);
+        return frag;
     }
 
     public static ComposeTweetDialogFragment newInstance(String title) {
@@ -99,17 +113,58 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
             });
         }
         else if (title.equals("Reply Tweet")) {
+            tweetToReply = (Tweet) Parcels.unwrap(getArguments().getParcelable("replyTo"));
+            binding.etCompose1.setText("@" + tweetToReply.getUser().getScreenName());
             binding.etCompose1.requestFocus();
             // set on click listener for send button
             binding.ivBtnTweet.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    binding.etCompose1.setText("No replies yet.");
+                    publishNewReply();
                 }
             });
         }
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
+
+    private void publishNewReply() {
+        String replyContent = binding.etCompose1.getText().toString();
+        if (replyContent.isEmpty()) {
+            return;
+        }
+        if (replyContent.length() > 140) {
+            return;
+        }
+        if (!replyContent.contains(tweetToReply.getUser().getScreenName())) {
+            return;
+        }
+        Log.i(TAG,replyContent);
+        Log.i(TAG,tweetToReply.getMaxId());
+        client.replyTweet(replyContent, tweetToReply.getMaxId(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "onSuccess to reply tweet");
+                try {
+                    Tweet tweet = Tweet.fromJson(json.jsonObject);
+                    Log.i(TAG,"Reply says: " + tweet.getBody());
+                    ComposeTweetDialogListener listener = (ComposeTweetDialogListener) getActivity();
+                    List<Tweet> tweet_and_reply = new ArrayList<>();
+                    tweet_and_reply.add(tweetToReply);
+                    tweet_and_reply.add(tweet);
+                    Log.i(TAG,String.valueOf(tweet_and_reply.size()));
+                    listener.onFinishEditDialog(tweet_and_reply);
+                    dismiss();
+                } catch (JSONException e) {
+                    Log.e(TAG,"Failed to get the tweet object", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,  "onFailure", throwable);
+            }
+        });
     }
 
     private void publishNewTweet() {
@@ -128,7 +183,9 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
                     Tweet tweet = Tweet.fromJson(json.jsonObject);
                     Log.i(TAG,"Published tweet says: " + tweet.getBody());
                     ComposeTweetDialogListener listener = (ComposeTweetDialogListener) getActivity();
-                    listener.onFinishEditDialog(tweet);
+                    List<Tweet> tweet_and_reply = new ArrayList<>();
+                    tweet_and_reply.add(tweet);
+                    listener.onFinishEditDialog(tweet_and_reply);
                     dismiss();
                 } catch (JSONException e) {
                     Log.e(TAG,"Failed to get the tweet object", e);

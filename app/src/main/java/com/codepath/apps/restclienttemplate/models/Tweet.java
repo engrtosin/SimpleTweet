@@ -1,7 +1,12 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.content.Context;
 import android.text.format.DateUtils;
 import android.util.Log;
+
+import com.codepath.apps.restclienttemplate.TwitterApp;
+import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import okhttp3.Headers;
 
 @Parcel
 public class Tweet {
@@ -30,6 +37,7 @@ public class Tweet {
     public Integer heartCount;
     public boolean userRetweeted;
     public boolean userHearted;
+    public String maxId;
 
     public boolean isUserRetweeted() {
         return userRetweeted;
@@ -71,6 +79,10 @@ public class Tweet {
         return heartCount;
     }
 
+    public String getMaxId() {
+        return maxId;
+    }
+
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
         tweet.replyCount = jsonObject.has("reply_count") ? jsonObject.getInt("reply_count") : 0;
@@ -78,6 +90,7 @@ public class Tweet {
         tweet.userRetweeted = jsonObject.getBoolean("retweeted");
         tweet.userHearted = jsonObject.getBoolean("favorited");
         tweet.heartCount = jsonObject.has("favorite_count") ? jsonObject.getInt("favorite_count") : 0;
+        tweet.maxId = jsonObject.getString("id_str");
         tweet.body = jsonObject.getString("text");
         String[] bodies = tweet.body.split(" http");
         tweet.body = bodies[0];
@@ -173,5 +186,69 @@ public class Tweet {
         relativeDate = relativeDateSplit[0] + relativeDateSplit[1].substring(0,1);
 
         return relativeDate;
+    }
+
+    public void retweetThis(Context context) {
+        TwitterClient client = TwitterApp.getRestClient(context);
+        client.retweetTweet(this.maxId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                retweetCount += 1;
+                userRetweeted = true;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,"cannot retweet", throwable);
+            }
+        });
+    }
+
+    public void unretweetThis(Context context) {
+        TwitterClient client = TwitterApp.getRestClient(context);
+        client.unretweetTweet(this.maxId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                retweetCount -= 1;
+                userRetweeted = false;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,"cannot unretweet", throwable);
+            }
+        });
+    }
+
+    public void heartThis(Context context) {
+        TwitterClient client = TwitterApp.getRestClient(context);
+        client.heartTweet(this.maxId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                heartCount += 1;
+                userHearted = true;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,"cannot heart", throwable);
+            }
+        });
+    }
+
+    public void unheartThis(Context context) {
+        TwitterClient client = TwitterApp.getRestClient(context);
+        client.unheartTweet(this.maxId, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                heartCount -= 1;
+                userHearted = false;
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.e(TAG,"cannot unheart", throwable);
+            }
+        });
     }
 }

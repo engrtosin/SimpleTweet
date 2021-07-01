@@ -233,9 +233,17 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
     }
 
     @Override
-    public void onFinishEditDialog(Tweet tweet) {
-        tweets.add(0,tweet);
-        tweetsAdapter.notifyItemInserted(0);
-        binding.rvTweets.smoothScrollToPosition(0);
+    public void onFinishEditDialog(List<Tweet> tweet_and_reply) {
+        if (tweet_and_reply.size() == 1) {
+            tweets.add(0, tweet_and_reply.get(0));
+            tweetsAdapter.notifyItemInserted(0);
+            binding.rvTweets.smoothScrollToPosition(0);
+        }
+        else if (tweet_and_reply.size() > 1) {
+            Log.i(TAG,"reply sent");
+            Intent intent = new Intent(this, TweetDetailActivity.class);
+            intent.putExtra("tweet and reply",Parcels.wrap(tweet_and_reply));
+            this.startActivity(intent);
+        }
     }
 }
