@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,30 +8,38 @@
     android:fitsSystemWindows="true"
     tools:context=".activities.TimelineActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/tbTimeline"
-        android:minHeight="?attr/actionBarSize"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:titleTextColor="@android:color/white"
-        android:background="@color/twitter_blue">
 
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="end" >
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-            <ImageView
-                android:id="@+id/btnLogout"
-                android:layout_width="60dp"
-                android:layout_height="22dp"
-                android:scaleType="fitXY"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:src="@drawable/twitter_logout" />
-        </LinearLayout>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tbTimeline"
+                android:minHeight="?attr/actionBarSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:titleTextColor="@android:color/white"
+                app:layout_scrollFlags="scroll|enterAlways"
+                android:background="@color/twitter_blue">
 
-    </androidx.appcompat.widget.Toolbar>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="end" >
+
+                    <ImageView
+                        android:id="@+id/btnLogout"
+                        android:layout_width="60dp"
+                        android:layout_height="22dp"
+                        android:scaleType="fitXY"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:src="@drawable/twitter_logout" />
+                </LinearLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeContainer"
@@ -52,4 +61,4 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
