@@ -23,8 +23,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/lbl_compose"
-        app:counterEnabled="true"
-        app:counterMaxLength="280"
         app:counterTextAppearance="@style/TextAppearance.AppCompat.Caption">
 
         <EditText
@@ -52,8 +50,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tilCompose"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="-25dp"
-        android:layout_marginEnd="55dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="60dp"
         app:tint="@color/twitter_blue"
         android:src="@drawable/outline_send_black_24dp"/>
+
+    <TextView
+        android:id="@+id/tvCharCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:layout_alignTop="@id/ivBtnTweet"
+        android:layout_alignBottom="@id/ivBtnTweet"
+        android:text="0/140" />
 </RelativeLayout>

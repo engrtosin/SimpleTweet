@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
@@ -54,11 +55,11 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
     ActivityTimelineBinding binding;
     MediaListAdapter mediaListAdapter;
     MenuItem miActionProgressItem;
+    long max_id = Long.MAX_VALUE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         client = TwitterApp.getRestClient(this);
 
         binding = ActivityTimelineBinding.inflate(getLayoutInflater());
@@ -91,8 +92,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
 
         tweets = new ArrayList<>();
         tweetsAdapter = new TweetsAdapter(this,tweets);
-
-        binding.rvTweets.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager rvTweetsLayoutManager = new LinearLayoutManager(this);
+        binding.rvTweets.setLayoutManager(rvTweetsLayoutManager);
         binding.rvTweets.setAdapter(tweetsAdapter);
 
         populateHomeTimeline();
@@ -101,6 +102,13 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
             @Override
             public void onRefresh() {
                 fetchTimelineAsync(0);
+            }
+        });
+
+        binding.rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(rvTweetsLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                TimelineActivity.this.fetchMoreTweets();
             }
         });
     }
@@ -136,7 +144,48 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
                 Log.i(TAG,"onSuccess " + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
-                    tweets.addAll(Tweet.fromJsonArray(jsonArray));
+                    List<Tweet> new_tweets = Tweet.fromJsonArray(jsonArray);
+                    tweets.addAll(new_tweets);
+                    tweetsAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    Log.e(TAG,"Cannot get tweets from jsonarray", e);
+                }
+                hideProgressBar();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+//                hideProgressBar();
+                Log.e(TAG,"onFailure " + response, throwable);
+            }
+        });
+    }
+
+//    private void getMinIdFromNewTweets(List<Tweet> new_tweets) {
+//        Log.i(TAG,"old max id: " + max_id);
+//        if (max_id > Long.valueOf(new_tweets.get(0).getId())) {
+////            Log.i(TAG,"max id is greater");
+//            max_id = Long.valueOf(new_tweets.get(0).getId());
+//        }
+////        Log.i(TAG, "tweet 0 id: " + new_tweets.get(0).getId());
+//        Log.i(TAG,"new max id: " + String.valueOf(max_id));
+//        new_tweets.remove(0);
+//    }
+
+    private void fetchMoreTweets() {
+        Log.i(TAG,"max id: " + tweets.get(tweets.size()-1).getId());
+        client.getMoreTweetsTimeline(tweets.get(tweets.size()-1).getId(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                showProgressBar();
+                Log.i(TAG,"onSuccess " + json.toString());
+                JSONArray jsonArray = json.jsonArray;
+                try {
+                    List<Tweet> new_tweets = Tweet.fromJsonArray(jsonArray);
+//                    Log.i(TAG,"old max id: " + max_id);
+                    max_id = Long.valueOf(new_tweets.get(new_tweets.size() - 1).getId()) - 1;
+//                    Log.i(TAG,"NEW max id: " + max_id);
+                    tweets.addAll(new_tweets);
                     tweetsAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     Log.e(TAG,"Cannot get tweets from jsonarray", e);
@@ -165,7 +214,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
                 tweetsAdapter.clear();
                 // ...the data has come back, add new items to your adapter...
                 try {
-                    tweetsAdapter.addAll(Tweet.fromJsonArray(json.jsonArray));
+                    List<Tweet> new_tweets = Tweet.fromJsonArray(json.jsonArray);
+                    tweets.addAll(new_tweets);
                     // Now we call setRefreshing(false) to signal refresh has finished
                     binding.swipeContainer.setRefreshing(false);
                 } catch (JSONException e) {

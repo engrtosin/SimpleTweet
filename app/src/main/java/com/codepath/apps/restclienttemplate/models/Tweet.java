@@ -37,7 +37,7 @@ public class Tweet {
     public Integer heartCount;
     public boolean userRetweeted;
     public boolean userHearted;
-    public String maxId;
+    public String id;
 
     public boolean isUserRetweeted() {
         return userRetweeted;
@@ -79,8 +79,8 @@ public class Tweet {
         return heartCount;
     }
 
-    public String getMaxId() {
-        return maxId;
+    public String getId() {
+        return id;
     }
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
@@ -92,7 +92,7 @@ public class Tweet {
         tweet.userRetweeted = jsonObject.getBoolean("retweeted");
         tweet.userHearted = jsonObject.getBoolean("favorited");
         tweet.heartCount = jsonObject.has("favorite_count") ? jsonObject.getInt("favorite_count") : 0;
-        tweet.maxId = jsonObject.getString("id_str");
+        tweet.id = jsonObject.getString("id_str");
         tweet.body = jsonObject.getString("text");
         String[] bodies = tweet.body.split(" http");
         tweet.body = bodies[0];
@@ -160,7 +160,8 @@ public class Tweet {
     public static List<Tweet> fromJsonArray(JSONArray jsonArray) throws JSONException {
         List<Tweet> tweets = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            tweets.add(fromJson(jsonArray.getJSONObject(i)));
+            Tweet tweet = fromJson(jsonArray.getJSONObject(i));
+            tweets.add(tweet);
         }
         return tweets;
     }
@@ -192,7 +193,7 @@ public class Tweet {
 
     public void retweetThis(Context context) {
         TwitterClient client = TwitterApp.getRestClient(context);
-        client.retweetTweet(this.maxId, new JsonHttpResponseHandler() {
+        client.retweetTweet(this.id, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 retweetCount += 1;
@@ -208,7 +209,7 @@ public class Tweet {
 
     public void unretweetThis(Context context) {
         TwitterClient client = TwitterApp.getRestClient(context);
-        client.unretweetTweet(this.maxId, new JsonHttpResponseHandler() {
+        client.unretweetTweet(this.id, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 retweetCount -= 1;
@@ -224,7 +225,7 @@ public class Tweet {
 
     public void heartThis(Context context) {
         TwitterClient client = TwitterApp.getRestClient(context);
-        client.heartTweet(this.maxId, new JsonHttpResponseHandler() {
+        client.heartTweet(this.id, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 heartCount += 1;
@@ -240,7 +241,7 @@ public class Tweet {
 
     public void unheartThis(Context context) {
         TwitterClient client = TwitterApp.getRestClient(context);
-        client.unheartTweet(this.maxId, new JsonHttpResponseHandler() {
+        client.unheartTweet(this.id, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 heartCount -= 1;

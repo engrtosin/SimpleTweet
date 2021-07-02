@@ -3,6 +3,8 @@ package com.codepath.apps.restclienttemplate.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -45,6 +47,7 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
     TwitterClient client;
     Tweet tweetToReply;
     String replyToId;
+    public static final int MAX_TWEET_LENGTH = 140;
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -95,6 +98,22 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.etCompose1.setOnEditorActionListener(this);
+        binding.etCompose1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                binding.tvCharCounter.setText((MAX_TWEET_LENGTH - (editable.toString().length())) + "/" + MAX_TWEET_LENGTH);
+            }
+        });
         // Get field from view
 //        mEditText = (EditText) view.findViewById(R.id.etCompose1);
 //        mBtnTweet = (ImageView) view.findViewById(R.id.)
@@ -140,8 +159,8 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
             return;
         }
         Log.i(TAG,replyContent);
-        Log.i(TAG,tweetToReply.getMaxId());
-        client.replyTweet(replyContent, tweetToReply.getMaxId(), new JsonHttpResponseHandler() {
+        Log.i(TAG,tweetToReply.getId());
+        client.replyTweet(replyContent, tweetToReply.getId(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 Log.i(TAG, "onSuccess to reply tweet");
