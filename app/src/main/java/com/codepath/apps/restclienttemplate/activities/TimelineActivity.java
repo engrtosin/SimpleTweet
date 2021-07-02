@@ -174,10 +174,10 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
 
     private void fetchMoreTweets() {
         Log.i(TAG,"max id: " + tweets.get(tweets.size()-1).getId());
+        showProgressBar();
         client.getMoreTweetsTimeline(tweets.get(tweets.size()-1).getId(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
-                showProgressBar();
                 Log.i(TAG,"onSuccess " + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
