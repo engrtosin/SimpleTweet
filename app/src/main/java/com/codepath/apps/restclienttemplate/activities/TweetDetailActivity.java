@@ -31,7 +31,6 @@ import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class TweetDetailActivity extends AppCompatActivity {
 
-    public static final int LOGOUT_RESULT_CODE = 40;
     public static final String TAG = "TweetDetailActivity";
     ActivityTweetDetailBinding binding;
     TwitterClient client;
@@ -77,13 +76,6 @@ public class TweetDetailActivity extends AppCompatActivity {
             setUpReplyView();
         }
     }
-
-//    private void onLogoutButton() {
-//        Intent intent = new Intent(this,TimelineActivity.class);
-//        Log.i(TAG,"Logout");
-//        intent.putExtra("Logout","true");
-//        this.startActivity(intent);
-//    }
 
     private void setUpDetailsView() {
         String bodyText = tweet.getBody();

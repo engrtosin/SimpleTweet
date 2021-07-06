@@ -2,12 +2,9 @@ package com.codepath.apps.restclienttemplate.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
@@ -19,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
@@ -30,6 +26,7 @@ import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding;
 import com.codepath.apps.restclienttemplate.fragments.ComposeTweetDialogFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.unused.MediaListAdapter;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -44,18 +41,12 @@ import okhttp3.Headers;
 
 public class TimelineActivity extends AppCompatActivity implements ComposeTweetDialogFragment.ComposeTweetDialogListener {
 
-    public static final int LOGOUT_RESULT_CODE = 40;
-    public final int REQUEST_CODE = 20;
-    public final int REQUEST_DETAILS_CODE = 30;
     public static final String TAG = "TimelineActivity";
     TwitterClient client;
     List<Tweet> tweets;
-//    RecyclerView rvTweets;
     TweetsAdapter tweetsAdapter;
     ActivityTimelineBinding binding;
-    MediaListAdapter mediaListAdapter;
     MenuItem miActionProgressItem;
-    long max_id = Long.MAX_VALUE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +77,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
         getSupportActionBar().setLogo(dr);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         setMenuIcons();
-
-//        rvTweets = binding.rvTweets;
-//        rvTweets = findViewById(R.id.rvTweets);
 
         tweets = new ArrayList<>();
         tweetsAdapter = new TweetsAdapter(this,tweets);
@@ -122,8 +110,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
     private void setMenuIcons() {
         Log.i(TAG,"setMenuIcons");
         MenuItem compose = (MenuItem) findViewById(R.id.compose);
-//        miActionProgressItem = (MenuItem) findViewById(R.id.miActionProgress);
-//        Log.i(TAG, miActionProgressItem.toString());
     }
 
     public void showProgressBar() {
@@ -155,22 +141,10 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-//                hideProgressBar();
                 Log.e(TAG,"onFailure " + response, throwable);
             }
         });
     }
-
-//    private void getMinIdFromNewTweets(List<Tweet> new_tweets) {
-//        Log.i(TAG,"old max id: " + max_id);
-//        if (max_id > Long.valueOf(new_tweets.get(0).getId())) {
-////            Log.i(TAG,"max id is greater");
-//            max_id = Long.valueOf(new_tweets.get(0).getId());
-//        }
-////        Log.i(TAG, "tweet 0 id: " + new_tweets.get(0).getId());
-//        Log.i(TAG,"new max id: " + String.valueOf(max_id));
-//        new_tweets.remove(0);
-//    }
 
     private void fetchMoreTweets() {
         Log.i(TAG,"max id: " + tweets.get(tweets.size()-1).getId());
@@ -182,9 +156,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
                 JSONArray jsonArray = json.jsonArray;
                 try {
                     List<Tweet> new_tweets = Tweet.fromJsonArray(jsonArray);
-//                    Log.i(TAG,"old max id: " + max_id);
-                    max_id = Long.valueOf(new_tweets.get(new_tweets.size() - 1).getId()) - 1;
-//                    Log.i(TAG,"NEW max id: " + max_id);
                     tweets.addAll(new_tweets);
                     tweetsAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
@@ -195,7 +166,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-//                hideProgressBar();
                 Log.e(TAG,"onFailure " + response, throwable);
             }
         });
@@ -209,7 +179,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
         client.getHomeTimeline(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
-//                hideProgressBar();
                 // Remember to CLEAR OUT old items before appending in the new ones
                 tweetsAdapter.clear();
                 // ...the data has come back, add new items to your adapter...
@@ -226,7 +195,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-//                hideProgressBar();
                 Log.e(TAG, "Fetch timeline error: ",throwable);
             }
         });
@@ -253,25 +221,9 @@ public class TimelineActivity extends AppCompatActivity implements ComposeTweetD
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.compose) {
             showEditDialog();
-//            Intent intent = new Intent(this, ComposeActivity.class);
-//            startActivityForResult(intent,REQUEST_CODE);
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
-            tweets.add(0,tweet);
-            tweetsAdapter.notifyItemInserted(0);
-            binding.rvTweets.smoothScrollToPosition(0);
-        }
-        if (requestCode == REQUEST_DETAILS_CODE && resultCode == LOGOUT_RESULT_CODE) {
-            onLogoutButton();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     // TimelineActivity.java

@@ -1,7 +1,5 @@
 package com.codepath.apps.restclienttemplate.fragments;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,16 +13,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
-import com.codepath.apps.restclienttemplate.activities.ComposeActivity;
-import com.codepath.apps.restclienttemplate.activities.TimelineActivity;
 import com.codepath.apps.restclienttemplate.databinding.FragmentEditNameBinding;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -41,12 +35,9 @@ import okhttp3.Headers;
 public class ComposeTweetDialogFragment extends DialogFragment implements TextView.OnEditorActionListener {
 
     public static final String TAG = "ComposeDialogFragment";
-    private EditText mEditText;
-    private ImageView mBtnTweet;
     FragmentEditNameBinding binding;
     TwitterClient client;
     Tweet tweetToReply;
-    String replyToId;
     public static final int MAX_TWEET_LENGTH = 140;
 
     @Override
@@ -115,8 +106,6 @@ public class ComposeTweetDialogFragment extends DialogFragment implements TextVi
             }
         });
         // Get field from view
-//        mEditText = (EditText) view.findViewById(R.id.etCompose1);
-//        mBtnTweet = (ImageView) view.findViewById(R.id.)
         // Fetch arguments from bundle and set title
         String title = getArguments().getString("title", "Enter Name");
         getDialog().setTitle(title);

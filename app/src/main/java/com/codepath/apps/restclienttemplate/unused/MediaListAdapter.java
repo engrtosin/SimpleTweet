@@ -1,4 +1,4 @@
-package com.codepath.apps.restclienttemplate.activities;
+package com.codepath.apps.restclienttemplate.unused;
 
 import android.content.Context;
 import android.util.Log;

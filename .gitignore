@@ -65,3 +65,6 @@ build
 import-summary.txt
 
 apikey.properties
+/app/src/main/java/com/codepath/apps/restclienttemplate/unused/ComposeActivity.java
+/app/src/main/java/com/codepath/apps/restclienttemplate/unused/
+/app/src/main/java/com/codepath/apps/restclienttemplate/unused/MediaListAdapter.java
